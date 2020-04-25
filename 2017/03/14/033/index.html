@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="docker总是崩溃，而且nas每天都要关机，想来想去还是觉得买块开发板跑这几个程序比较稳。但是还不知道使用体验如何，所以我决定先装个虚拟机测试一下。我用的是ubuntu 16.04 kylin这个版本。然后主要要安装HA和HB这两个东西。  homebridge  homeassistant因为我自己完全不懂linux，所以这篇会记录的很细，把我每一个操作都记录下来。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="“技术白痴的尝试”在linux虚拟机中安装homeassistant和homebridge">
+<meta property="og:url" content="http://b.420297.xyz/2017/03/14/033/index.html">
+<meta property="og:site_name" content="420X297">
+<meta property="og:description" content="docker总是崩溃，而且nas每天都要关机，想来想去还是觉得买块开发板跑这几个程序比较稳。但是还不知道使用体验如何，所以我决定先装个虚拟机测试一下。我用的是ubuntu 16.04 kylin这个版本。然后主要要安装HA和HB这两个东西。  homebridge  homeassistant因为我自己完全不懂linux，所以这篇会记录的很细，把我每一个操作都记录下来。">
+<meta property="article:published_time" content="2017-03-14T13:51:57.000Z">
+<meta property="article:modified_time" content="2017-03-27T03:23:06.000Z">
+<meta property="article:author" content="Alston">
+<meta property="article:tag" content="homebridge">
+<meta property="article:tag" content="homeassistant">
+<meta property="article:tag" content="homekit">
+<meta property="article:tag" content="ubuntu">
+<meta property="article:tag" content="智能家居">
+<meta name="twitter:card" content="summary">
+  <link rel="canonical" href="http://b.420297.xyz/2017/03/14/033/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>“技术白痴的尝试”在linux虚拟机中安装homeassistant和homebridge | 420X297</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">420X297</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">间歇性写作综合征资深患者</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-home&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-tags&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Schlagwörter</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-th&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Kategorien</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-archive&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Archiv</a>
+
+  </li>
+  </ul>
+
+    
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://b.420297.xyz/2017/03/14/033/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Alston">
+      <meta itemprop="description" content="不会敲代码的厨子不是好建筑师">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="420X297">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">“技术白痴的尝试”在linux虚拟机中安装homeassistant和homebridge
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2017-03-14 21:51:57" itemprop="dateCreated datePublished" datetime="2017-03-14T21:51:57+08:00">2017-03-14</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2017-03-27 11:23:06" itemprop="dateModified" datetime="2017-03-27T11:23:06+08:00">2017-03-27</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">in</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>docker总是崩溃，而且nas每天都要关机，想来想去还是觉得买块开发板跑这几个程序比较稳。但是还不知道使用体验如何，所以我决定先装个虚拟机测试一下。<br>我用的是ubuntu 16.04 kylin这个版本。然后主要要安装HA和HB这两个东西。</p>
+<blockquote>
+<p>homebridge<br>  homeassistant<br>因为我自己完全不懂linux，所以这篇会记录的很细，把我每一个操作都记录下来。</p>
+</blockquote>
+<a id="more"></a>
+
+<h1 id="安置好虚拟机，安装ubuntu"><a href="#安置好虚拟机，安装ubuntu" class="headerlink" title="安置好虚拟机，安装ubuntu"></a>安置好虚拟机，安装ubuntu</h1><p>安装好ubuntu之后，要先安装ssh服务并开启  </p>
+<blockquote>
+<p>sudo apt-get install openssh-server</p>
+</blockquote>
+<p> 安装完成之后，检查是否开启ssh服务</p>
+<blockquote>
+<p>ps -e|grep ssh</p>
+</blockquote>
+<p> 输出下面的信息就是开启成功的状态</p>
+<blockquote>
+<p>xxxx ?        00:00:00 sshd</p>
+</blockquote>
+<h1 id="ssh登录到虚拟机"><a href="#ssh登录到虚拟机" class="headerlink" title="ssh登录到虚拟机"></a>ssh登录到虚拟机</h1><h2 id="打开终端"><a href="#打开终端" class="headerlink" title="打开终端"></a>打开终端</h2><blockquote>
+<p>ssh username@ip -p port  </p>
+</blockquote>
+<h2 id="设置root账户并登陆"><a href="#设置root账户并登陆" class="headerlink" title="设置root账户并登陆"></a>设置root账户并登陆</h2><h3 id="设置主账户密码"><a href="#设置主账户密码" class="headerlink" title="设置主账户密码"></a>设置主账户密码</h3><blockquote>
+<p>sudo passwd </p>
+</blockquote>
+<h3 id="设置root账户密码"><a href="#设置root账户密码" class="headerlink" title="设置root账户密码"></a>设置root账户密码</h3><blockquote>
+<p>sudo passwd root</p>
+</blockquote>
+<h3 id="登录到root账户"><a href="#登录到root账户" class="headerlink" title="登录到root账户"></a>登录到root账户</h3><blockquote>
+<p>su root</p>
+</blockquote>
+<h1 id="安装homebridge和homeassistant"><a href="#安装homebridge和homeassistant" class="headerlink" title="安装homebridge和homeassistant"></a>安装homebridge和homeassistant</h1><h2 id="更新软件包"><a href="#更新软件包" class="headerlink" title="更新软件包"></a>更新软件包</h2><blockquote>
+<p>sudo apt-get update<br>sudo apt-get upgrade<br> 然后要等很长时间</p>
+</blockquote>
+<h2 id="安装几个必要的包curl-python-nodejs-npm-以及homebridge必要的依赖包libavahi-compat-libdnssd-dev"><a href="#安装几个必要的包curl-python-nodejs-npm-以及homebridge必要的依赖包libavahi-compat-libdnssd-dev" class="headerlink" title="安装几个必要的包curl,python,nodejs,npm,以及homebridge必要的依赖包libavahi-compat-libdnssd-dev"></a>安装几个必要的包curl,python,nodejs,npm,以及homebridge必要的依赖包libavahi-compat-libdnssd-dev</h2><blockquote>
+<p>sudo apt-get install -y samba screen git<br>sudo apt-get install curl<br>curl -sL <a href="https://deb.nodesource.com/setup_6.x" target="_blank" rel="noopener">https://deb.nodesource.com/setup_6.x</a> | sudo -E bash -<br>sudo apt-get install -y nodejs<br>sudo apt-get install libavahi-compat-libdnssd-dev</p>
+</blockquote>
+<h2 id="安装homebridge"><a href="#安装homebridge" class="headerlink" title="安装homebridge"></a>安装homebridge</h2><blockquote>
+<p>sudo npm install -g –unsafe-perm homebridge hap-nodejs node-gyp</p>
+</blockquote>
+<h3 id="测试一下homebridge能不能正常运行"><a href="#测试一下homebridge能不能正常运行" class="headerlink" title="测试一下homebridge能不能正常运行"></a>测试一下homebridge能不能正常运行</h3><blockquote>
+<p>homebridge<br>如果homebridge安装正确的话，现在能看到如下图的信息，并且会有按个homekit的认证码。</p>
+</blockquote>
+<h2 id="安装homebridge的homeassistant插件"><a href="#安装homebridge的homeassistant插件" class="headerlink" title="安装homebridge的homeassistant插件"></a>安装homebridge的homeassistant插件</h2><blockquote>
+<p>sudo npm install -g homebridge-homeassistant</p>
+</blockquote>
+<h2 id="安装homeassistant"><a href="#安装homeassistant" class="headerlink" title="安装homeassistant"></a>安装homeassistant</h2><blockquote>
+<p>sudo apt-get install python3-pip<br>pip3 install homeassistant<br>hass</p>
+</blockquote>
+<p>稍微等一会，终端上出现</p>
+<blockquote>
+<p>INFO:homeassistant.components.http:Serving / to 10.0.2.2 (auth: True)<br>说明homeassistant已经正常运行了，在电脑浏览器上代开网址：ip:8123（虚拟机ip地址），不出意外的话就能看到homeassistant的网页了，如下图。</p>
+</blockquote>
+<p>然后，新建一个终端页面，ssh登录到虚拟机，并登录到root账户</p>
+<h1 id="配置homebridge和homeassistant"><a href="#配置homebridge和homeassistant" class="headerlink" title="配置homebridge和homeassistant"></a>配置homebridge和homeassistant</h1><h2 id="配置homebridge的config-json文件"><a href="#配置homebridge的config-json文件" class="headerlink" title="配置homebridge的config.json文件"></a>配置homebridge的config.json文件</h2><blockquote>
+<p>cd<br>cd .homebridge<br>sudo nano config.json</p>
+</blockquote>
+<p>这里会打开一个文本编辑器，把下面这段文字复制进去，复制前要编辑好几个项。<br>复制好了ctrl+X退出来并保存。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;bridge&quot;: &#123;</span><br><span class="line">        &quot;name&quot;: &quot;Homebridge&quot;,</span><br><span class="line">        &quot;username&quot;: &quot;D2:DE:8C:2F:57:41&quot;,</span><br><span class="line">        &quot;port&quot;: 51826,</span><br><span class="line">        &quot;pin&quot;: &quot;123-45-678&quot;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;platforms&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;platform&quot;: &quot;HomeAssistant&quot;,</span><br><span class="line">            &quot;name&quot;: &quot;HomeAssistant&quot;,</span><br><span class="line">            &quot;host&quot;: &quot;http:&#x2F;&#x2F;192.168.2.241:8123&quot;,</span><br><span class="line">            &quot;password&quot;: &quot;raspberry&quot;,</span><br><span class="line">            &quot;supported_types&quot;: [</span><br><span class="line">                &quot;fan&quot;,</span><br><span class="line">                &quot;garage_door&quot;,</span><br><span class="line">                &quot;input_boolean&quot;,</span><br><span class="line">                &quot;light&quot;,</span><br><span class="line">                &quot;lock&quot;,</span><br><span class="line">                &quot;media_player&quot;,</span><br><span class="line">                &quot;rollershutter&quot;,</span><br><span class="line">                &quot;scene&quot;,</span><br><span class="line">                &quot;switch&quot;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>本篇还没写完我的orangepi就到了，所以接下去的步骤请移步<a href="http://gamja.site/2017/03/21/orangepihomebridge/" target="_blank" rel="noopener">几十块实现用siri控制家电
+</a></p>
+<p>私以为这是一次不错的尝试，做得很有趣。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/homebridge/" rel="tag"># homebridge</a>
+            
+              <a href="/tags/homeassistant/" rel="tag"># homeassistant</a>
+            
+              <a href="/tags/homekit/" rel="tag"># homekit</a>
+            
+              <a href="/tags/ubuntu/" rel="tag"># ubuntu</a>
+            
+              <a href="/tags/%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85/" rel="tag"># 智能家居</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2017/02/24/032/" rel="next" title="记徒手部署黑群晖">
+                  <i class="fa fa-chevron-left"></i> 记徒手部署黑群晖
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2017/03/21/034/" rel="prev" title="几十块实现用siri控制家电">
+                  几十块实现用siri控制家电 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安置好虚拟机，安装ubuntu"><span class="nav-number">1.</span> <span class="nav-text">安置好虚拟机，安装ubuntu</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ssh登录到虚拟机"><span class="nav-number">2.</span> <span class="nav-text">ssh登录到虚拟机</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#打开终端"><span class="nav-number">2.1.</span> <span class="nav-text">打开终端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置root账户并登陆"><span class="nav-number">2.2.</span> <span class="nav-text">设置root账户并登陆</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置主账户密码"><span class="nav-number">2.2.1.</span> <span class="nav-text">设置主账户密码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置root账户密码"><span class="nav-number">2.2.2.</span> <span class="nav-text">设置root账户密码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#登录到root账户"><span class="nav-number">2.2.3.</span> <span class="nav-text">登录到root账户</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装homebridge和homeassistant"><span class="nav-number">3.</span> <span class="nav-text">安装homebridge和homeassistant</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#更新软件包"><span class="nav-number">3.1.</span> <span class="nav-text">更新软件包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装几个必要的包curl-python-nodejs-npm-以及homebridge必要的依赖包libavahi-compat-libdnssd-dev"><span class="nav-number">3.2.</span> <span class="nav-text">安装几个必要的包curl,python,nodejs,npm,以及homebridge必要的依赖包libavahi-compat-libdnssd-dev</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装homebridge"><span class="nav-number">3.3.</span> <span class="nav-text">安装homebridge</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#测试一下homebridge能不能正常运行"><span class="nav-number">3.3.1.</span> <span class="nav-text">测试一下homebridge能不能正常运行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装homebridge的homeassistant插件"><span class="nav-number">3.4.</span> <span class="nav-text">安装homebridge的homeassistant插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装homeassistant"><span class="nav-number">3.5.</span> <span class="nav-text">安装homeassistant</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置homebridge和homeassistant"><span class="nav-number">4.</span> <span class="nav-text">配置homebridge和homeassistant</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置homebridge的config-json文件"><span class="nav-number">4.1.</span> <span class="nav-text">配置homebridge的config.json文件</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Alston</p>
+  <div class="site-description" itemprop="description">不会敲代码的厨子不是好建筑师</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/%20%7C%7C%20archive">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">schlagwörter</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alston</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+<script src="/js/utils.js?v=7.4.0.js"></script>
+
+<script src="/js/motion.js?v=7.4.0.js"></script>
+
+
+<script src="/js/schemes/muse.js?v=7.4.0.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.0.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

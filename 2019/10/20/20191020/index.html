@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="这个东西实际上不怎么重要，但是我还是很经常用到HA的web界面的，所以对象的名称和分组在这个时候就很重要了。这里涉及到group.yaml和customize.yaml两个文件，都在homeassistant的根目录下。本来这部分的内容要放在后面讲的，但是我实在等不及了，这几天web界面太乱了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【智能家居：五】自定义对象及分组">
+<meta property="og:url" content="http://b.420297.xyz/2019/10/20/20191020/index.html">
+<meta property="og:site_name" content="420X297">
+<meta property="og:description" content="这个东西实际上不怎么重要，但是我还是很经常用到HA的web界面的，所以对象的名称和分组在这个时候就很重要了。这里涉及到group.yaml和customize.yaml两个文件，都在homeassistant的根目录下。本来这部分的内容要放在后面讲的，但是我实在等不及了，这几天web界面太乱了。">
+<meta property="og:image" content="https://i.loli.net/2019/10/20/Bquj6gyFbAMvcZa.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/20/D76XeSYAnxUqmQi.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/20/XIqCE3FaHVYkiAO.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/20/z8xkcOjESNholqC.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/20/j3RncWX26rlpqHP.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/20/GkpKHW9vLiEentU.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/20/fAlBb16cPHrIWYD.png">
+<meta property="article:published_time" content="2019-10-19T17:48:53.000Z">
+<meta property="article:modified_time" content="2019-10-19T19:41:28.000Z">
+<meta property="article:author" content="Alston">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2019/10/20/Bquj6gyFbAMvcZa.png">
+  <link rel="canonical" href="http://b.420297.xyz/2019/10/20/20191020/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>【智能家居：五】自定义对象及分组 | 420X297</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">420X297</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">间歇性写作综合征资深患者</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-home&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-tags&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Schlagwörter</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-th&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Kategorien</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-archive&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Archiv</a>
+
+  </li>
+  </ul>
+
+    
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://b.420297.xyz/2019/10/20/20191020/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Alston">
+      <meta itemprop="description" content="不会敲代码的厨子不是好建筑师">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="420X297">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">【智能家居：五】自定义对象及分组
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-10-20 01:48:53 / Geändert am: 03:41:28" itemprop="dateCreated datePublished" datetime="2019-10-20T01:48:53+08:00">2019-10-20</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">in</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这个东西实际上不怎么重要，但是我还是很经常用到HA的web界面的，所以对象的名称和分组在这个时候就很重要了。这里涉及到group.yaml和customize.yaml两个文件，都在homeassistant的根目录下。本来这部分的内容要放在后面讲的，但是我实在等不及了，这几天web界面太乱了。</p>
+<p><img src="https://i.loli.net/2019/10/20/Bquj6gyFbAMvcZa.png" alt="1.png"></p>
+<a id="more"></a>
+
+<h1 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h1><p>如果没有编辑group.yaml文件，ha的web界面中会自动按照设备类型来区分，比如开关、灯具、空调、自动化、脚本等。通过group.yaml这个文件，我们可以对不同的设备进行分组。</p>
+<p><img src="https://i.loli.net/2019/10/20/D76XeSYAnxUqmQi.png" alt="1.png"></p>
+<p>打开根目录下的group.yaml文件，如果之前没有动过，这里面就是空的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"># 基本信息</span><br><span class="line">base: #分组名称</span><br><span class="line">  view: false #view属性决定是否形成单独标签页</span><br><span class="line">  entities: #设备列表</span><br><span class="line">    - binary_sensor.homecheck</span><br><span class="line">    - device_tracker.xr</span><br><span class="line">    - device_tracker.wxx</span><br><span class="line">    - person.weng_xin</span><br><span class="line">    - person.wang_yuzhen</span><br><span class="line">    - binary_sensor.door_window_sensor_158d0001b75f6e</span><br><span class="line"></span><br><span class="line"># 安防系统</span><br><span class="line">anfang:</span><br><span class="line">  view: false</span><br><span class="line">  entities:</span><br><span class="line">    - switch.br_dianshigui</span><br><span class="line">    - switch.br_canbiangui</span><br><span class="line">    - automation.home_cam_off</span><br><span class="line">    - automation.home_cam_on</span><br><span class="line">    - automation.sleep_cam_off</span><br><span class="line">    - automation.sleep_cam_on</span><br><span class="line">    </span><br><span class="line"># 餐厅厨房</span><br><span class="line">kitchen:</span><br><span class="line">  view: false</span><br><span class="line">  entities:</span><br><span class="line">    - binary_sensor.motion_sensor_158d0001d926fa</span><br><span class="line">    - binary_sensor.motion_sensor_158d0002c154ed</span><br><span class="line">    - fan.fan_canting</span><br><span class="line">    - switch.wall_switch_ln_left_158d00023ab205</span><br><span class="line">    - switch.wall_switch_ln_right_158d0002324710</span><br><span class="line">    - light.light_canbiangui</span><br><span class="line">    - sensor.distance_canbiangui</span><br><span class="line">    - switch.br_canbiangui</span><br><span class="line">    - automation.chufangdeng_auto_off</span><br><span class="line">    - automation.chufangdeng_auto_on</span><br></pre></td></tr></table></figure>
+
+<p>我的习惯是把每个房间相关的内容都分到一个组里面，这样操作起来比较方便。</p>
+<h1 id="自定义"><a href="#自定义" class="headerlink" title="自定义"></a>自定义</h1><p>通过这个功能可以对设备的属性做一些补充实现自定义的要求。</p>
+<h2 id="汉化、隐藏等属性"><a href="#汉化、隐藏等属性" class="headerlink" title="汉化、隐藏等属性"></a>汉化、隐藏等属性</h2><p>打开customize.yaml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 几个参数下面会解释</span><br><span class="line"># customize.yaml</span><br><span class="line"></span><br><span class="line">fan.fan_2S: # 对象名称（entity_id）</span><br><span class="line">  friendly_name: 智米风扇 #friendly_name就是用来设定自定义名称的，这里可以直接输入中文</span><br><span class="line">fan.fan_canting:</span><br><span class="line">  friendly_name: 餐厅风扇</span><br><span class="line">switch.br_shufangdianwenxiang:</span><br><span class="line">  friendly_name: 书房电蚊香</span><br><span class="line">  icon: mdi:ladybug # 自定义图标，下面有延伸</span><br><span class="line">binary_sensor.switch_158d00016c0ce6:</span><br><span class="line">  friendly_name: 餐边柜按钮</span><br><span class="line">  hidden: true #在ha的web界面中隐藏</span><br><span class="line">  homebridge_hidden: true #在homebridge插件中隐藏，现在好像不行了。</span><br></pre></td></tr></table></figure>
+
+<p>其他的硬件的设置也同上，这个挺麻烦的，但是配置过程就是这样。</p>
+<h2 id="图标自定义"><a href="#图标自定义" class="headerlink" title="图标自定义"></a>图标自定义</h2><p>HA的自定义系统里面我很喜欢这个调用图标库的功能，<a href="https://materialdesignicons.com/" target="_blank" rel="noopener">mdi</a>这个网站里的图标都可以直接用。</p>
+<p>第一步，先打开<a href="https://materialdesignicons.com/" target="_blank" rel="noopener">mdi网站</a>，然后找打你想用的图标</p>
+<p><img src="https://i.loli.net/2019/10/20/XIqCE3FaHVYkiAO.png" alt="1.png"></p>
+<p>第二步，记录下图标的名称</p>
+<p><img src="https://i.loli.net/2019/10/20/z8xkcOjESNholqC.png" alt="2.png"></p>
+<p>第三步，在cunstomize中定义icon，只需要在图标名称前面加上’mdi:’</p>
+<p><img src="https://i.loli.net/2019/10/20/j3RncWX26rlpqHP.png" alt="3.png"></p>
+<p>这样就能显示图标了。</p>
+<p><img src="https://i.loli.net/2019/10/20/GkpKHW9vLiEentU.png" alt="4.png"></p>
+<hr>
+<p>修改过后的界面清楚多了。</p>
+<p><img src="https://i.loli.net/2019/10/20/fAlBb16cPHrIWYD.png" alt="0.png"></p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/10/09/20191009/" rel="next" title="【智能家居：四】将MQTT设备加入HA平台">
+                  <i class="fa fa-chevron-left"></i> 【智能家居：四】将MQTT设备加入HA平台
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/04/26/aosdjfaois/" rel="prev" title="aosdjfaois">
+                  aosdjfaois <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#分组"><span class="nav-number">1.</span> <span class="nav-text">分组</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自定义"><span class="nav-number">2.</span> <span class="nav-text">自定义</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#汉化、隐藏等属性"><span class="nav-number">2.1.</span> <span class="nav-text">汉化、隐藏等属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图标自定义"><span class="nav-number">2.2.</span> <span class="nav-text">图标自定义</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Alston</p>
+  <div class="site-description" itemprop="description">不会敲代码的厨子不是好建筑师</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/%20%7C%7C%20archive">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">schlagwörter</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alston</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+<script src="/js/utils.js?v=7.4.0.js"></script>
+
+<script src="/js/motion.js?v=7.4.0.js"></script>
+
+
+<script src="/js/schemes/muse.js?v=7.4.0.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.0.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

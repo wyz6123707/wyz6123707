@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="出去旅游几天回来发现树莓派上的内存卡废了，只好重新画大力气再部署一遍智能家居，想起来上次这样折腾已经是半年前了吧。因此我认为HA这种平台还是需要有一定动手能力，半年崩盘这种事情，一般人应该受不了，而且取决于内存卡的寿命，一切都很难讲。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【智能家居：一】树莓派部署home-assistant平台">
+<meta property="og:url" content="http://b.420297.xyz/2019/10/08/20191008/index.html">
+<meta property="og:site_name" content="420X297">
+<meta property="og:description" content="出去旅游几天回来发现树莓派上的内存卡废了，只好重新画大力气再部署一遍智能家居，想起来上次这样折腾已经是半年前了吧。因此我认为HA这种平台还是需要有一定动手能力，半年崩盘这种事情，一般人应该受不了，而且取决于内存卡的寿命，一切都很难讲。">
+<meta property="og:image" content="https://i.loli.net/2019/10/08/OJsnAhdjE5RGpbr.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/08/DPoMJBgXyneWuF3.png">
+<meta property="article:published_time" content="2019-10-07T16:02:04.000Z">
+<meta property="article:modified_time" content="2019-10-07T18:19:50.000Z">
+<meta property="article:author" content="Alston">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2019/10/08/OJsnAhdjE5RGpbr.png">
+  <link rel="canonical" href="http://b.420297.xyz/2019/10/08/20191008/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>【智能家居：一】树莓派部署home-assistant平台 | 420X297</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">420X297</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">间歇性写作综合征资深患者</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-home&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-tags&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Schlagwörter</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-th&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Kategorien</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-archive&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Archiv</a>
+
+  </li>
+  </ul>
+
+    
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://b.420297.xyz/2019/10/08/20191008/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Alston">
+      <meta itemprop="description" content="不会敲代码的厨子不是好建筑师">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="420X297">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">【智能家居：一】树莓派部署home-assistant平台
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-10-08 00:02:04 / Geändert am: 02:19:50" itemprop="dateCreated datePublished" datetime="2019-10-08T00:02:04+08:00">2019-10-08</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">in</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>出去旅游几天回来发现树莓派上的内存卡废了，只好重新画大力气再部署一遍智能家居，想起来上次这样折腾已经是半年前了吧。因此我认为HA这种平台还是需要有一定动手能力，半年崩盘这种事情，一般人应该受不了，而且取决于内存卡的寿命，一切都很难讲。</p>
+<a id="more"></a>
+
+<h1 id="固件"><a href="#固件" class="headerlink" title="固件"></a>固件</h1><h2 id="下载固件"><a href="#下载固件" class="headerlink" title="下载固件"></a>下载固件</h2><p>官网下载最新固件，用etcher或者win32diskmgr烧录到内存卡上。</p>
+<h2 id="烧录"><a href="#烧录" class="headerlink" title="烧录"></a>烧录</h2><p>烧录完成后，<strong>创建一个空白文件命名为ssh拷贝进内存卡的根目录下，用以开启ssh功能。</strong></p>
+<h1 id="首次启动"><a href="#首次启动" class="headerlink" title="首次启动"></a>首次启动</h1><h2 id="基础配置"><a href="#基础配置" class="headerlink" title="基础配置"></a>基础配置</h2><blockquote>
+<p>sudo raspi-config</p>
+</blockquote>
+<p>进入初始配置，改个密码，改个时区，扩大一下系统空间，其他改不改都无所谓，然后输入</p>
+<blockquote>
+<p>sudo reboot</p>
+</blockquote>
+<p>重启树莓派</p>
+<h2 id="首次更新"><a href="#首次更新" class="headerlink" title="首次更新"></a>首次更新</h2><blockquote>
+<p>sudo apt-get update</p>
+<p>sudo apt-get upgrade</p>
+</blockquote>
+<p>一套基本更新和升级，</p>
+<h2 id="安装samba"><a href="#安装samba" class="headerlink" title="安装samba"></a>安装samba</h2><p>由于每次换源之后，都没办法正常安装samba，所以在换源之前就要先把samba安装清楚</p>
+<blockquote>
+<p>apt-get install libcups2 samba samba-common cups</p>
+<p>apt-get install samba</p>
+</blockquote>
+<p>安装完成后编辑samba配置，加入root文件夹。</p>
+<blockquote>
+<p> sudo nano /etc/samba/smb.conf</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root]</span><br><span class="line">    comment &#x3D; Admin Config Share</span><br><span class="line">    path &#x3D; &#x2F;</span><br><span class="line">    valid users &#x3D; root</span><br><span class="line">    force user &#x3D; root</span><br><span class="line">    force group &#x3D; root</span><br><span class="line">    admin users &#x3D; root   </span><br><span class="line">    writeable &#x3D; Yes</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>sudo smbpasswd -a root<br>sudo systemctl restart smbd.service</p>
+</blockquote>
+<p>大功告成~！</p>
+<h1 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h1><h2 id="添加docker官方GPG-key"><a href="#添加docker官方GPG-key" class="headerlink" title="添加docker官方GPG key"></a>添加docker官方GPG key</h2><blockquote>
+<p>curl -fsSL <a href="https://download.docker.com/linux/$" target="_blank" rel="noopener">https://download.docker.com/linux/$</a>(. /etc/os-release; echo “$ID”)/gpg | sudo apt-key add -</p>
+</blockquote>
+<h2 id="添加-Docker-CE-仓库"><a href="#添加-Docker-CE-仓库" class="headerlink" title="添加 Docker CE 仓库"></a>添加 Docker CE 仓库</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;deb [arch&#x3D;armhf] https:&#x2F;&#x2F;download.docker.com&#x2F;linux&#x2F;debian \</span><br><span class="line">      $(lsb_release -cs) stable&quot; | \</span><br><span class="line">     sudo tee &#x2F;etc&#x2F;apt&#x2F;sources.list.d&#x2F;docker.list</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装docker-ce"><a href="#安装docker-ce" class="headerlink" title="安装docker-ce"></a>安装docker-ce</h2><blockquote>
+<p>sudo apt-get update<br>sudo apt-get install docker-ce<br>sudo usermod -aG docker $USER</p>
+</blockquote>
+<h2 id="增加-Docker-仓库镜像"><a href="#增加-Docker-仓库镜像" class="headerlink" title="增加 Docker 仓库镜像"></a>增加 Docker 仓库镜像</h2><blockquote>
+<p>sudo nano /etc/docker/daemon.json</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https:&#x2F;&#x2F;registry.docker-cn.com&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="部署home-assistant"><a href="#部署home-assistant" class="headerlink" title="部署home-assistant"></a>部署home-assistant</h1><h2 id="复制代码，进入root账户"><a href="#复制代码，进入root账户" class="headerlink" title="复制代码，进入root账户"></a>复制代码，进入root账户</h2><blockquote>
+<p>sudo -i<br>apt-get install software-properties-common<br>add-apt-repository universe<br>apt-get update<br>apt-get install -y apparmor-utils apt-transport-https avahi-daemon ca-certificates curl dbus jq network-manager socat<br>curl -fsSL get.docker.com | sh</p>
+</blockquote>
+<h2 id="树莓派3-输入"><a href="#树莓派3-输入" class="headerlink" title="树莓派3 输入"></a>树莓派3 输入</h2><blockquote>
+<p>curl -sL “<a href="https://raw.githubusercontent.com/home-assistant/hassio-installer/master/hassio_install.sh&quot;" target="_blank" rel="noopener">https://raw.githubusercontent.com/home-assistant/hassio-installer/master/hassio_install.sh&quot;</a> | bash -s – -m raspberrypi3</p>
+</blockquote>
+<p><img src="https://i.loli.net/2019/10/08/OJsnAhdjE5RGpbr.png" alt="1570467350648.png"></p>
+<h2 id="打开浏览器，输入树莓派IP-端口号8123-http-192-168-1-2-8123"><a href="#打开浏览器，输入树莓派IP-端口号8123-http-192-168-1-2-8123" class="headerlink" title="打开浏览器，输入树莓派IP+端口号8123( http://192.168.1.2:8123)"></a>打开浏览器，输入树莓派IP+端口号8123( <a href="http://192.168.1.2:8123" target="_blank" rel="noopener">http://192.168.1.2:8123</a>)</h2><p><img src="https://i.loli.net/2019/10/08/DPoMJBgXyneWuF3.png" alt="1570467482011.png"></p>
+<p>看到这个页面，说明Home-Assistant部署完成，接下去就是配置各种硬件了。详见下一篇<a href="http://b.0522.xyz/2019/10/08/201910082/" target="_blank" rel="noopener">《【智能家居：二】HA添加各平台硬件及中文设置》</a>！</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Tech/" rel="tag"># Tech</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/03/29/20190329/" rel="next" title="职业生涯的阶段性总结">
+                  <i class="fa fa-chevron-left"></i> 职业生涯的阶段性总结
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/10/08/201910082/" rel="prev" title="【智能家居：二】HA添加各平台硬件及中文设置">
+                  【智能家居：二】HA添加各平台硬件及中文设置 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#固件"><span class="nav-number">1.</span> <span class="nav-text">固件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#下载固件"><span class="nav-number">1.1.</span> <span class="nav-text">下载固件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#烧录"><span class="nav-number">1.2.</span> <span class="nav-text">烧录</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#首次启动"><span class="nav-number">2.</span> <span class="nav-text">首次启动</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础配置"><span class="nav-number">2.1.</span> <span class="nav-text">基础配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#首次更新"><span class="nav-number">2.2.</span> <span class="nav-text">首次更新</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装samba"><span class="nav-number">2.3.</span> <span class="nav-text">安装samba</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装docker"><span class="nav-number">3.</span> <span class="nav-text">安装docker</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#添加docker官方GPG-key"><span class="nav-number">3.1.</span> <span class="nav-text">添加docker官方GPG key</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加-Docker-CE-仓库"><span class="nav-number">3.2.</span> <span class="nav-text">添加 Docker CE 仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装docker-ce"><span class="nav-number">3.3.</span> <span class="nav-text">安装docker-ce</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增加-Docker-仓库镜像"><span class="nav-number">3.4.</span> <span class="nav-text">增加 Docker 仓库镜像</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署home-assistant"><span class="nav-number">4.</span> <span class="nav-text">部署home-assistant</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#复制代码，进入root账户"><span class="nav-number">4.1.</span> <span class="nav-text">复制代码，进入root账户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#树莓派3-输入"><span class="nav-number">4.2.</span> <span class="nav-text">树莓派3 输入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打开浏览器，输入树莓派IP-端口号8123-http-192-168-1-2-8123"><span class="nav-number">4.3.</span> <span class="nav-text">打开浏览器，输入树莓派IP+端口号8123( http:&#x2F;&#x2F;192.168.1.2:8123)</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Alston</p>
+  <div class="site-description" itemprop="description">不会敲代码的厨子不是好建筑师</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/%20%7C%7C%20archive">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">schlagwörter</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alston</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+<script src="/js/utils.js?v=7.4.0.js"></script>
+
+<script src="/js/motion.js?v=7.4.0.js"></script>
+
+
+<script src="/js/schemes/muse.js?v=7.4.0.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.0.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

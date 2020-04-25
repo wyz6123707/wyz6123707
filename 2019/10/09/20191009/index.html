@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="HA平台能兼容MQTT真的是相当关键的一步，很多大佬自制的固件，通过MQTT的方式连接到HA平台，实现各种传感器和电器的接入，成本低，稳定性高。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【智能家居：四】将MQTT设备加入HA平台">
+<meta property="og:url" content="http://b.420297.xyz/2019/10/09/20191009/index.html">
+<meta property="og:site_name" content="420X297">
+<meta property="og:description" content="HA平台能兼容MQTT真的是相当关键的一步，很多大佬自制的固件，通过MQTT的方式连接到HA平台，实现各种传感器和电器的接入，成本低，稳定性高。">
+<meta property="og:image" content="https://i.loli.net/2019/10/09/Omho4k3wMKQHvTX.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/10/09/r3oh8KaMucNfzFO.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/09/FW5kSvdqr2RJlDn.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/09/Fvq6ouybOdW1TRZ.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/09/Omho4k3wMKQHvTX.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/10/20/agU4TvJqpRjYzkh.png">
+<meta property="og:image" content="https://i.loli.net/2019/10/20/i4I1O6p9btyeShz.png">
+<meta property="article:published_time" content="2019-10-09T13:49:31.000Z">
+<meta property="article:modified_time" content="2019-10-19T17:48:40.000Z">
+<meta property="article:author" content="Alston">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2019/10/09/Omho4k3wMKQHvTX.jpg">
+  <link rel="canonical" href="http://b.420297.xyz/2019/10/09/20191009/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>【智能家居：四】将MQTT设备加入HA平台 | 420X297</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">420X297</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">间歇性写作综合征资深患者</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-home&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-tags&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Schlagwörter</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-th&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Kategorien</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-archive&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Archiv</a>
+
+  </li>
+  </ul>
+
+    
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://b.420297.xyz/2019/10/09/20191009/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Alston">
+      <meta itemprop="description" content="不会敲代码的厨子不是好建筑师">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="420X297">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">【智能家居：四】将MQTT设备加入HA平台
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2019-10-09 21:49:31" itemprop="dateCreated datePublished" datetime="2019-10-09T21:49:31+08:00">2019-10-09</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-10-20 01:48:40" itemprop="dateModified" datetime="2019-10-20T01:48:40+08:00">2019-10-20</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">in</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>HA平台能兼容MQTT真的是相当关键的一步，很多大佬自制的固件，通过MQTT的方式连接到HA平台，实现各种传感器和电器的接入，成本低，稳定性高。</p>
+<p><img src="https://i.loli.net/2019/10/09/Omho4k3wMKQHvTX.jpg" alt="微信图片_20191009221950.jpg"></p>
+<a id="more"></a>
+
+<h1 id="部署HA中的MQTT服务端"><a href="#部署HA中的MQTT服务端" class="headerlink" title="部署HA中的MQTT服务端"></a>部署HA中的MQTT服务端</h1><p>当初之所以花那么大力气装hassio也是为了可以通过这个方便的办法安装各种插件，实际上只是为了MQTT。</p>
+<h2 id="安装服务端"><a href="#安装服务端" class="headerlink" title="安装服务端"></a>安装服务端</h2><p>1、在左下角点击hass.io，这个是只有装了hassio版本的ha平台才会有的页面，通过其他方式安装的比如python或者docker，就没有了。</p>
+<p>点击hass.io，在上面的标签中找到ADD-ON STORE，然后在下面的列表里找到Mosquitto broker，点击install。</p>
+<p><img src="https://i.loli.net/2019/10/09/r3oh8KaMucNfzFO.png" alt="65416.png"></p>
+<p>2、安装完需要配置mqtt服务端的用户名和密码，懒得改的直接复制就行了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;logins&quot;: [</span><br><span class="line">    &#123;</span><br><span class="line">      &quot;username&quot;: &quot;mqtt&quot;,</span><br><span class="line">      &quot;password&quot;: &quot;mqtt&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  &quot;anonymous&quot;: false,</span><br><span class="line">  &quot;customize&quot;: &#123;</span><br><span class="line">    &quot;active&quot;: false,</span><br><span class="line">    &quot;folder&quot;: &quot;mosquitto&quot;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;certfile&quot;: &quot;fullchain.pem&quot;,</span><br><span class="line">  &quot;keyfile&quot;: &quot;privkey.pem&quot;,</span><br><span class="line">  &quot;require_certificate&quot;: false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://i.loli.net/2019/10/09/FW5kSvdqr2RJlDn.png" alt="2.png"></p>
+<p>3、配置完就点restart重启就行了</p>
+<p><img src="https://i.loli.net/2019/10/09/Fvq6ouybOdW1TRZ.png" alt="3.png"></p>
+<h2 id="配置HA中的MQTT设置"><a href="#配置HA中的MQTT设置" class="headerlink" title="配置HA中的MQTT设置"></a>配置HA中的MQTT设置</h2><p>在HA的configuration中添加MQTT服务端的相关设置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mqtt:</span><br><span class="line">  broker: 192.168.1.200</span><br><span class="line">  port: 1883</span><br><span class="line">  client_id: home-assistant-1</span><br><span class="line">  keepalive: 60</span><br><span class="line">  username: pi</span><br><span class="line">  password: raspberry</span><br><span class="line">  discovery: true</span><br></pre></td></tr></table></figure>
+
+<p>brocker是你MQTT服务端的IP，如果按上述办法安装的话就和树莓派是同一个IP，username和password就是刚刚设置的用户名和密码。</p>
+<h1 id="sonoff开关"><a href="#sonoff开关" class="headerlink" title="sonoff开关"></a>sonoff开关</h1><p>这东西淘宝上买一个就二三十块，结构也很简单就一块ESP01+继电器。我的sonoff开关连到灯具作为灯具的开关了，所以这里会添加为一个MQTT LIGHT。</p>
+<p>买回来之后我刷入了tasmota固件，设置好mqtt服务端、用户名、密码，就连接到刚才设置好的MQTT服务器了。</p>
+<h2 id="HA设置"><a href="#HA设置" class="headerlink" title="HA设置"></a>HA设置</h2><p>在configuration中添加light</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">light:</span><br><span class="line">  - platform: mqtt</span><br><span class="line">    name: &quot;light_jingqiandeng&quot;</span><br><span class="line">    state_topic: &quot;stat&#x2F;jqd&#x2F;POWER&quot;</span><br><span class="line">    command_topic: &quot;cmnd&#x2F;jqd&#x2F;POWER&quot;</span><br><span class="line">    qos: 1</span><br><span class="line">    payload_on: &quot;ON&quot;</span><br><span class="line">    payload_off: &quot;OFF&quot;</span><br><span class="line">    retain: true</span><br></pre></td></tr></table></figure>
+
+<p><strong>上面出现的jqd，是tasmota固件中MQTT设置里的device topic。</strong></p>
+<h1 id="基于ESP8266的各类传感器"><a href="#基于ESP8266的各类传感器" class="headerlink" title="基于ESP8266的各类传感器"></a>基于ESP8266的各类传感器</h1><p>这里我用的是espeasy这款开源固件，可以接各种各样的传感器。我用的最多的就是温湿度传感器、人体传感器和超声波测距传感器。</p>
+<p><img src="https://i.loli.net/2019/10/09/Omho4k3wMKQHvTX.jpg" alt="微信图片_20191009221950.jpg"></p>
+<h2 id="ESPEASY固件安装"><a href="#ESPEASY固件安装" class="headerlink" title="ESPEASY固件安装"></a>ESPEASY固件安装</h2><p>我用的是ESP8266 V3这块板子，自带USB口，直接插电脑上然后刷就行了。</p>
+<p><a href="https://www.letscontrolit.com/wiki/index.php/ESPEasy" target="_blank" rel="noopener">espeasy官网</a>可以下载固件和烧录程序，非常简单，像我这样的小白也可以轻松上手。</p>
+<h2 id="客户端设置"><a href="#客户端设置" class="headerlink" title="客户端设置"></a>客户端设置</h2><p>初始化之后，设置好wifi和MQTT服务器，就可以正常接入了。</p>
+<p><img src="https://i.loli.net/2019/10/20/agU4TvJqpRjYzkh.png" alt="1.png"></p>
+<p>硬件连接这边我就无需多说了，3v3和gnd对准插好就行了，信号线接gpio口，然后在ESPEASY的WEB界面里面设置一下就可以用了。</p>
+<p><img src="https://i.loli.net/2019/10/20/i4I1O6p9btyeShz.png" alt="2.png"></p>
+<h2 id="举个例子"><a href="#举个例子" class="headerlink" title="举个例子"></a>举个例子</h2><p>我的书桌上有个小东西，是一块8266的板子，连了超神波测距传感器、温湿度传感器、人体传感器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 人体传感器</span><br><span class="line">binary_sensor:</span><br><span class="line">- platform: mqtt</span><br><span class="line">  name: shufangrenti</span><br><span class="line">  state_topic: &quot;&#x2F;esp3&#x2F;pir&#x2F;motion&quot;</span><br><span class="line">  payload_on: &quot;1&quot;</span><br><span class="line">  payload_off: &quot;0&quot;</span><br><span class="line">  qos: 0</span><br><span class="line">  device_class: motion</span><br><span class="line"># 超声波测距传感器</span><br><span class="line">sensor:</span><br><span class="line">- platform: mqtt</span><br><span class="line">  name: &quot;distance_shuzhuo&quot;</span><br><span class="line">  state_topic: &#39;&#x2F;esp3&#x2F;sr04&#x2F;dist&#39;</span><br><span class="line">  qos: 1</span><br><span class="line">  unit_of_measurement: &quot;cm&quot;</span><br><span class="line"># 温度传感器</span><br><span class="line">sensor:</span><br><span class="line">- platform: mqtt</span><br><span class="line">  name: &quot;temp_shufang&quot;</span><br><span class="line">  state_topic: &#39;&#x2F;esp3&#x2F;dht22&#x2F;tem&#39;</span><br><span class="line">  #value_template: &#39;&#123;&#123; value_json.Temperature &#125;&#125;&#39;</span><br><span class="line">  unit_of_measurement: &#39;°C&#39;</span><br></pre></td></tr></table></figure>
+
+<p>通过人体传感器判定是否有人在书房，夜间可以自动开灯，人离开的时候可以自动关灯。</p>
+<p>超声波测距传感器可以确认我是否在书桌前，可以自动开关书桌的台灯。</p>
+<p>温湿度传感器就是在夏天自动开冷气或者在冬天自动开暖气的，不过我的书房目前没有暖气。</p>
+<p>以上就是MQTT设备的接入，其实还有很多MQTT设备，官网上也可以看到，比如窗帘、定位系统、风扇、空调、各种开关等。</p>
+<p>HA平台对MQTT的支持，使得HA的可玩性大大提高，目前有很多大佬都自制了各种MQTT硬件，价格比成品产品便宜质量也不差。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/10/09/201910083/" rel="next" title="【智能家居：三】小米非网关设备连接">
+                  <i class="fa fa-chevron-left"></i> 【智能家居：三】小米非网关设备连接
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/10/20/20191020/" rel="prev" title="【智能家居：五】自定义对象及分组">
+                  【智能家居：五】自定义对象及分组 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#部署HA中的MQTT服务端"><span class="nav-number">1.</span> <span class="nav-text">部署HA中的MQTT服务端</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装服务端"><span class="nav-number">1.1.</span> <span class="nav-text">安装服务端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置HA中的MQTT设置"><span class="nav-number">1.2.</span> <span class="nav-text">配置HA中的MQTT设置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sonoff开关"><span class="nav-number">2.</span> <span class="nav-text">sonoff开关</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HA设置"><span class="nav-number">2.1.</span> <span class="nav-text">HA设置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基于ESP8266的各类传感器"><span class="nav-number">3.</span> <span class="nav-text">基于ESP8266的各类传感器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ESPEASY固件安装"><span class="nav-number">3.1.</span> <span class="nav-text">ESPEASY固件安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端设置"><span class="nav-number">3.2.</span> <span class="nav-text">客户端设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#举个例子"><span class="nav-number">3.3.</span> <span class="nav-text">举个例子</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Alston</p>
+  <div class="site-description" itemprop="description">不会敲代码的厨子不是好建筑师</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/%20%7C%7C%20archive">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">schlagwörter</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alston</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+<script src="/js/utils.js?v=7.4.0.js"></script>
+
+<script src="/js/motion.js?v=7.4.0.js"></script>
+
+
+<script src="/js/schemes/muse.js?v=7.4.0.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.0.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

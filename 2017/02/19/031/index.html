@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Kopieren',
+      copy_success: 'Kopiert',
+      copy_failure: 'Kopieren fehlgeschlagen'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="口袋里有点闲钱，想装新机子貌似完全不够，留着也迟早会被我挥霍完，想来想去索性买台NAS。 在淘宝逛了一天，大概知道群晖和威联通两个牌子，爬了一些网文知道群晖的系统优化更好更适合我这种小白或家庭用户。不过两个牌子都是贵，性价比实在不怎么样。 遂转战闲鱼又逛了一天，找到一个人1200出群晖ds216j加一块普通硬盘。聊了一会儿就下单了。剩下满是期待的三天等待时间。卖家很客气包了顺丰。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈黑白群晖">
+<meta property="og:url" content="http://b.420297.xyz/2017/02/19/031/index.html">
+<meta property="og:site_name" content="420X297">
+<meta property="og:description" content="口袋里有点闲钱，想装新机子貌似完全不够，留着也迟早会被我挥霍完，想来想去索性买台NAS。 在淘宝逛了一天，大概知道群晖和威联通两个牌子，爬了一些网文知道群晖的系统优化更好更适合我这种小白或家庭用户。不过两个牌子都是贵，性价比实在不怎么样。 遂转战闲鱼又逛了一天，找到一个人1200出群晖ds216j加一块普通硬盘。聊了一会儿就下单了。剩下满是期待的三天等待时间。卖家很客气包了顺丰。">
+<meta property="og:image" content="https://ob6zmzrkm.qnssl.com/sthnas2.JPG">
+<meta property="og:image" content="https://ob6zmzrkm.qnssl.com/sthnas1.JPG">
+<meta property="article:published_time" content="2017-02-19T15:53:15.000Z">
+<meta property="article:modified_time" content="2017-02-19T16:51:40.000Z">
+<meta property="article:author" content="Alston">
+<meta property="article:tag" content="nas">
+<meta property="article:tag" content="synology">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ob6zmzrkm.qnssl.com/sthnas2.JPG">
+  <link rel="canonical" href="http://b.420297.xyz/2017/02/19/031/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>浅谈黑白群晖 | 420X297</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">420X297</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">间歇性写作综合征资深患者</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Navigationsleiste an/ausschalten">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-home&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Startseite</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-tags&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Schlagwörter</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-th&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Kategorien</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section">&lt;i class&#x3D;&quot;menu-item-icon fa fa-fw fa-archive&quot;&gt;&lt;&#x2F;i&gt; &lt;br&gt;Archiv</a>
+
+  </li>
+  </ul>
+
+    
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://b.420297.xyz/2017/02/19/031/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Alston">
+      <meta itemprop="description" content="不会敲代码的厨子不是好建筑师">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="420X297">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">浅谈黑白群晖
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Veröffentlicht am</span>
+
+              
+                
+              
+
+              <time title="Erstellt: 2017-02-19 23:53:15" itemprop="dateCreated datePublished" datetime="2017-02-19T23:53:15+08:00">2017-02-19</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2017-02-20 00:51:40" itemprop="dateModified" datetime="2017-02-20T00:51:40+08:00">2017-02-20</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">in</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>口袋里有点闲钱，想装新机子貌似完全不够，留着也迟早会被我挥霍完，想来想去索性买台NAS。</p>
+<p>在淘宝逛了一天，大概知道群晖和威联通两个牌子，爬了一些网文知道群晖的系统优化更好更适合我这种小白或家庭用户。不过两个牌子都是贵，性价比实在不怎么样。</p>
+<p>遂转战闲鱼又逛了一天，找到一个人1200出群晖ds216j加一块普通硬盘。聊了一会儿就下单了。剩下满是期待的三天等待时间。卖家很客气包了顺丰。</p>
+<a id="more"></a>
+<p>收到货后检查外观，配件，阅读快速使用说明，马上通电插网线，通过电脑访问很快就安装好了机器上的系统。设置了quickconnect和群晖账户，又等了20分钟安装了几个套件。终于可以正常使用，但是系统反应比我想象中慢得多。而且有个大问题，系统自带的download station完全没有迅雷好用。并且，不能从iCloud下载文件，这是我之前没有了解过，满心期待有这种功能，但是并没有。并且这台机器配置太差，不能装docker也没有转码功能。后来发现硬盘异响严重，与卖家交流后他竟然提出包顺丰退回去给他。不过我还是不太好意思，退货时自己付了回程的运费。</p>
+<p><img src="https://ob6zmzrkm.qnssl.com/sthnas2.JPG" alt=""></p>
+<p>决定退货后，还是想要拥有一台NAS，原因如下：</p>
+<p>· 体验过群晖，清楚的知道手机上几个应用很好用，特别是备份照片，可以完全不用iCloud了。</p>
+<p>· 同时用ssh装了离线迅雷后，也可以下载电影。</p>
+<p>· 在局域网下通过ds file播放1080p的mkv也不会卡。</p>
+<p>· 虽然没有用过，但是听说docker很强大，看到了docker上的迅雷和homebridge之类的应用，感觉可玩性非常高.</p>
+<p>· mac实现了time machine备份功能</p>
+<p>· 给两台电脑都设置了快捷方式，直接访问NAS上的文件夹，十分方便</p>
+<p>这些是使用DS216j三个小时后的主要感受。然而转念一想，黑群晖也大可以实现这些功能，甚至我自己组的黑群晖配置更高，还可以用docker实现更多好玩的功能，于是着手开始购置黑群晖的硬件。入手了一块二手华擎B85主板，135元，因为风扇插槽有三个，正好够我机箱配的几个风扇，且华擎主板听说改mac地址比较方便便于我洗白。还买了一块2T西数红盘，585元，希望噪音小一点能够正常使用。淘宝上还有300多的2T红盘，应该是假的。</p>
+<p><img src="https://ob6zmzrkm.qnssl.com/sthnas1.JPG" alt=""><br>在网络上找到了许多黑群晖的教程，如硬件选购，系统搭建，启动盘制作，洗白，docker及拓展等，每一个环节都非常复杂。黑群晖可以实现群晖在局域网的大部分功能，若洗白后，听说不能升级大版本，其他功能可以全部实现（包括远程唤醒）。</p>
+<hr>
+<p>这里还是要说一点的，就是黑群晖洗白这件事，我心里其实非常抗拒这件事，用盗版软件勉强可以接受，毕竟这种量级的软件就算要买我也买不起。但是洗白后，就是用了人家quickconnect的服务器资源，这一点对白群晖用户是极为不公的。所以我很期待群晖哪天可以卖服务，月付年付或买断都可以，价格合理的话我十分愿意买。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/nas/" rel="tag"># nas</a>
+            
+              <a href="/tags/synology/" rel="tag"># synology</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2016/12/21/030/" rel="next" title="fuckthedesign">
+                  <i class="fa fa-chevron-left"></i> fuckthedesign
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2017/02/24/032/" rel="prev" title="记徒手部署黑群晖">
+                  记徒手部署黑群晖 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Inhaltsverzeichnis
+        </li>
+        <li class="sidebar-nav-overview">
+          Übersicht
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Alston</p>
+  <div class="site-description" itemprop="description">不会敲代码的厨子不是好建筑师</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/%20%7C%7C%20archive">
+        
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">Artikel</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">Kategorien</span>
+        
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">schlagwörter</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alston</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+<script src="/js/utils.js?v=7.4.0.js"></script>
+
+<script src="/js/motion.js?v=7.4.0.js"></script>
+
+
+<script src="/js/schemes/muse.js?v=7.4.0.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.0.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
